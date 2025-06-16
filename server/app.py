@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from models import db
 from werkzeug.exceptions import NotFound
+from flask_cors import CORS
+
 
 from views.user_view import UserResource, UserByID
 from views.group_view import GroupResource, GroupByID
@@ -12,9 +14,11 @@ from views.loans_view import LoanResource, LoanByID
 from views.repayment_view import RepaymentResource, RepaymentByID
 from views.transaction_view import TransactionResource, TransactionById
 from views.savings_view import SavingsResource, SavingsById
+from views.userLoginResorce import UserLoginResource
 
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///proxima.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
@@ -38,6 +42,7 @@ api.add_resource(TransactionResource, '/transactions')
 api.add_resource(TransactionById, '/transaction/<int:id>')
 api.add_resource(SavingsResource, '/savings')
 api.add_resource(SavingsById, '/savings/<int:id>')
+api.add_resource(UserLoginResource, "/login")
 
 @app.route('/')
 def index():
