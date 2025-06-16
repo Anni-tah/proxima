@@ -13,8 +13,8 @@ class UserResource(Resource):
         new_user = User(
             name=data['name'],
             email=data['email'],
-            phone_number=data['phone'],          
-            password_hash=data['password'],     
+            phone_number=data['phone_number'], 
+            password_hash=data['password'],
             role=data['role']
         )
 
