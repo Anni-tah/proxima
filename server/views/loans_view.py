@@ -1,6 +1,7 @@
 from flask import jsonify, make_response, request
 from flask_restful import Resource
 from models import Loan, db
+from datetime import datetime  # ✅ Needed for parsing the due_date
 
 class LoanResource(Resource):
     def get(self):
@@ -15,11 +16,17 @@ class LoanResource(Resource):
         if not all(field in data for field in required_fields):
             return make_response({"error": "Missing required fields"}, 400)
 
+        try:
+            # ✅ convert due_date string to a Python date object
+            due_date_obj = datetime.strptime(data['due_date'], "%Y-%m-%d").date()
+        except ValueError:
+            return make_response({"error": "Invalid date format. Use YYYY-MM-DD."}, 400)
+
         new_loan = Loan(
             amount=data['amount'],
             interest_rate=data['interest_rate'],
             status=data['status'],
-            due_date=data['due_date'],
+            due_date=due_date_obj,  # ✅ use the parsed date object
             repaid=data['repaid'],
             user_id=data['user_id'],
             group_id=data['group_id']
@@ -32,7 +39,6 @@ class LoanResource(Resource):
 
 
 class LoanByID(Resource):
-
     def get(self, id):
         loan = Loan.query.filter_by(id=id).first()
         if not loan:
@@ -46,13 +52,16 @@ class LoanByID(Resource):
 
         data = request.get_json()
         for attr in data:
-            if hasattr(loan, attr):
+            if attr == "due_date":
+                try:
+                    setattr(loan, attr, datetime.strptime(data[attr], "%Y-%m-%d").date())
+                except ValueError:
+                    return make_response({"error": "Invalid date format. Use YYYY-MM-DD."}, 400)
+            elif hasattr(loan, attr):
                 setattr(loan, attr, data[attr])
 
         db.session.commit()
-
-        response_dict = loan.to_dict()
-        return make_response(response_dict, 200)
+        return make_response(loan.to_dict(), 200)
 
     def delete(self, id):
         loan = Loan.query.get(id)

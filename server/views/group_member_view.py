@@ -10,9 +10,16 @@ class GroupMemberResource(Resource):
     def post(self):
         data = request.get_json()
 
-        # Ensure required fields exist
         if 'user_id' not in data or 'group_id' not in data:
             return make_response({"error": "user_id and group_id are required fields"}, 400)
+
+    #  Check if user is already a member of this group
+        existing_member = GroupMember.query.filter_by(
+            user_id=data['user_id'], group_id=data['group_id']
+        ).first()
+
+        if existing_member:
+            return make_response({"message": "User is already a member of this group"}, 400)
 
         new_groupmember = GroupMember(
             user_id=data['user_id'],
@@ -25,6 +32,7 @@ class GroupMemberResource(Resource):
         db.session.commit()
 
         return make_response(new_groupmember.to_dict(), 201)
+
 
 class GrpMemberByID(Resource):
 

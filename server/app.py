@@ -15,6 +15,11 @@ from views.repayment_view import RepaymentResource, RepaymentByID
 from views.transaction_view import TransactionResource, TransactionById
 from views.savings_view import SavingsResource, SavingsById
 from views.userLoginResorce import UserLoginResource
+from views.group_saving_view import GroupSavingsResource
+from views.user_groups_view import UserGroups
+from views.user_loan_resource import UserLoansResource
+from views.loans_stats_resource import UserLoanStats
+from views.user_repayment_resource import UserRepaymentHistory
 
 
 app = Flask(__name__)
@@ -43,6 +48,11 @@ api.add_resource(TransactionById, '/transaction/<int:id>')
 api.add_resource(SavingsResource, '/savings')
 api.add_resource(SavingsById, '/savings/<int:id>')
 api.add_resource(UserLoginResource, "/login")
+api.add_resource(GroupSavingsResource, '/group-savings-summary')
+api.add_resource(UserGroups, '/user-groups/<int:user_id>')
+api.add_resource(UserLoansResource, "/user-loans/<int:user_id>")
+api.add_resource(UserLoanStats, '/user-loan-summary/<int:user_id>')
+api.add_resource(UserRepaymentHistory, "/user-repayment-history/<int:user_id>")
 
 @app.route('/')
 def index():
